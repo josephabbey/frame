@@ -20,5 +20,5 @@ display = "frame:display"
 debug = "frame:debug"
 
 [build-system]
-requires = ["uv_build>=0.13.5,<0.14"]
+requires = ["uv_build>=0.10.0"]
 build-backend = "uv_build"
