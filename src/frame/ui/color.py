@@ -1,147 +1,130 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Literal
+from dataclasses import dataclass
+from enum import StrEnum
 
 from material_color_utilities import DynamicScheme
 
+ColorValue = str | int | tuple[int, ...]
 
-@dataclass
+
+class ColorRole(StrEnum):
+    BACKGROUND = "background"
+    SURFACE = "surface"
+    SURFACE_DIM = "surface_dim"
+    SURFACE_BRIGHT = "surface_bright"
+    SURFACE_CONTAINER_LOWEST = "surface_container_lowest"
+    SURFACE_CONTAINER_LOW = "surface_container_low"
+    SURFACE_CONTAINER = "surface_container"
+    SURFACE_CONTAINER_HIGH = "surface_container_high"
+    SURFACE_CONTAINER_HIGHEST = "surface_container_highest"
+    ON_SURFACE = "on_surface"
+    SURFACE_VARIANT = "surface_variant"
+    ON_SURFACE_VARIANT = "on_surface_variant"
+    INVERSE_SURFACE = "inverse_surface"
+    INVERSE_ON_SURFACE = "inverse_on_surface"
+    OUTLINE = "outline"
+    OUTLINE_VARIANT = "outline_variant"
+    SHADOW = "shadow"
+    SCRIM = "scrim"
+    SURFACE_TINT = "surface_tint"
+    PRIMARY = "primary"
+    ON_PRIMARY = "on_primary"
+    PRIMARY_CONTAINER = "primary_container"
+    ON_PRIMARY_CONTAINER = "on_primary_container"
+    INVERSE_PRIMARY = "inverse_primary"
+    SECONDARY = "secondary"
+    ON_SECONDARY = "on_secondary"
+    SECONDARY_CONTAINER = "secondary_container"
+    ON_SECONDARY_CONTAINER = "on_secondary_container"
+    TERTIARY = "tertiary"
+    ON_TERTIARY = "on_tertiary"
+    TERTIARY_CONTAINER = "tertiary_container"
+    ON_TERTIARY_CONTAINER = "on_tertiary_container"
+    ERROR = "error"
+    ON_ERROR = "on_error"
+    ERROR_CONTAINER = "error_container"
+    ON_ERROR_CONTAINER = "on_error_container"
+    PRIMARY_FIXED = "primary_fixed"
+    PRIMARY_FIXED_DIM = "primary_fixed_dim"
+    ON_PRIMARY_FIXED = "on_primary_fixed"
+    ON_PRIMARY_FIXED_VARIANT = "on_primary_fixed_variant"
+    SECONDARY_FIXED = "secondary_fixed"
+    SECONDARY_FIXED_DIM = "secondary_fixed_dim"
+    ON_SECONDARY_FIXED = "on_secondary_fixed"
+    ON_SECONDARY_FIXED_VARIANT = "on_secondary_fixed_variant"
+    TERTIARY_FIXED = "tertiary_fixed"
+    TERTIARY_FIXED_DIM = "tertiary_fixed_dim"
+    ON_TERTIARY_FIXED = "on_tertiary_fixed"
+    ON_TERTIARY_FIXED_VARIANT = "on_tertiary_fixed_variant"
+
+
 class Color(ABC):
     @abstractmethod
-    def __call__(self, scheme: DynamicScheme):
-        pass
+    def __call__(self, scheme: DynamicScheme) -> str:
+        raise NotImplementedError
 
 
-@dataclass
-class HexColor:
-    color: str
+@dataclass(frozen=True)
+class HexColor(Color):
+    value: str
 
-    def __call__(self, scheme: DynamicScheme):
-        return self.color
+    def __call__(self, scheme: DynamicScheme) -> str:
+        return self.value
 
 
-@dataclass
+@dataclass(frozen=True)
 class SchemeColor(Color):
-    color: Literal[
-        "background",
-        "surface",
-        "surface_dim",
-        "surface_bright",
-        "surface_container_lowest",
-        "surface_container_low",
-        "surface_container",
-        "surface_container_high",
-        "surface_container_highest",
-        "on_surface",
-        "surface_variant",
-        "on_surface_variant",
-        "inverse_surface",
-        "inverse_on_surface",
-        "outline",
-        "outline_variant",
-        "shadow",
-        "scrim",
-        "surface_tint",
-        "primary",
-        "on_primary",
-        "primary_container",
-        "on_primary_container",
-        "inverse_primary",
-        "secondary",
-        "on_secondary",
-        "secondary_container",
-        "on_secondary_container",
-        "tertiary",
-        "on_tertiary",
-        "tertiary_container",
-        "on_tertiary_container",
-        "error",
-        "on_error",
-        "error_container",
-        "on_error_container",
-        "primary_fixed",
-        "primary_fixed_dim",
-        "on_primary_fixed",
-        "on_primary_fixed_variant",
-        "secondary_fixed",
-        "secondary_fixed_dim",
-        "on_secondary_fixed",
-        "on_secondary_fixed_variant",
-        "tertiary_fixed",
-        "tertiary_fixed_dim",
-        "on_tertiary_fixed",
-        "on_tertiary_fixed_variant",
-    ]
+    role: ColorRole
 
-    def __call__(self, scheme: DynamicScheme):
-        return getattr(scheme, self.color)
+    def __call__(self, scheme: DynamicScheme) -> str:
+        return getattr(scheme, self.role.value)
 
 
-BACKGROUND = field(default_factory=lambda: SchemeColor("background"))
-SURFACE = field(default_factory=lambda: SchemeColor("surface"))
-SURFACE_DIM = field(default_factory=lambda: SchemeColor("surface_dim"))
-SURFACE_BRIGHT = field(default_factory=lambda: SchemeColor("surface_bright"))
-SURFACE_CONTAINER_LOWEST = field(
-    default_factory=lambda: SchemeColor("surface_container_lowest")
-)
-SURFACE_CONTAINER_LOW = field(
-    default_factory=lambda: SchemeColor("surface_container_low")
-)
-SURFACE_CONTAINER = field(default_factory=lambda: SchemeColor("surface_container"))
-SURFACE_CONTAINER_HIGH = field(
-    default_factory=lambda: SchemeColor("surface_container_high")
-)
-SURFACE_CONTAINER_HIGHEST = field(
-    default_factory=lambda: SchemeColor("surface_container_highest")
-)
-ON_SURFACE = field(default_factory=lambda: SchemeColor("on_surface"))
-SURFACE_VARIANT = field(default_factory=lambda: SchemeColor("surface_variant"))
-ON_SURFACE_VARIANT = field(default_factory=lambda: SchemeColor("on_surface_variant"))
-INVERSE_SURFACE = field(default_factory=lambda: SchemeColor("inverse_surface"))
-INVERSE_ON_SURFACE = field(default_factory=lambda: SchemeColor("inverse_on_surface"))
-OUTLINE = field(default_factory=lambda: SchemeColor("outline"))
-OUTLINE_VARIANT = field(default_factory=lambda: SchemeColor("outline_variant"))
-SHADOW = field(default_factory=lambda: SchemeColor("shadow"))
-SCRIM = field(default_factory=lambda: SchemeColor("scrim"))
-SURFACE_TINT = field(default_factory=lambda: SchemeColor("surface_tint"))
-PRIMARY = field(default_factory=lambda: SchemeColor("primary"))
-ON_PRIMARY = field(default_factory=lambda: SchemeColor("on_primary"))
-PRIMARY_CONTAINER = field(default_factory=lambda: SchemeColor("primary_container"))
-ON_PRIMARY_CONTAINER = field(
-    default_factory=lambda: SchemeColor("on_primary_container")
-)
-INVERSE_PRIMARY = field(default_factory=lambda: SchemeColor("inverse_primary"))
-SECONDARY = field(default_factory=lambda: SchemeColor("secondary"))
-ON_SECONDARY = field(default_factory=lambda: SchemeColor("on_secondary"))
-SECONDARY_CONTAINER = field(default_factory=lambda: SchemeColor("secondary_container"))
-ON_SECONDARY_CONTAINER = field(
-    default_factory=lambda: SchemeColor("on_secondary_container")
-)
-TERTIARY = field(default_factory=lambda: SchemeColor("tertiary"))
-ON_TERTIARY = field(default_factory=lambda: SchemeColor("on_tertiary"))
-TERTIARY_CONTAINER = field(default_factory=lambda: SchemeColor("tertiary_container"))
-ON_TERTIARY_CONTAINER = field(
-    default_factory=lambda: SchemeColor("on_tertiary_container")
-)
-ERROR = field(default_factory=lambda: SchemeColor("error"))
-ON_ERROR = field(default_factory=lambda: SchemeColor("on_error"))
-ERROR_CONTAINER = field(default_factory=lambda: SchemeColor("error_container"))
-ON_ERROR_CONTAINER = field(default_factory=lambda: SchemeColor("on_error_container"))
-PRIMARY_FIXED = field(default_factory=lambda: SchemeColor("primary_fixed"))
-PRIMARY_FIXED_DIM = field(default_factory=lambda: SchemeColor("primary_fixed_dim"))
-ON_PRIMARY_FIXED = field(default_factory=lambda: SchemeColor("on_primary_fixed"))
-ON_PRIMARY_FIXED_VARIANT = field(
-    default_factory=lambda: SchemeColor("on_primary_fixed_variant")
-)
-SECONDARY_FIXED = field(default_factory=lambda: SchemeColor("secondary_fixed"))
-SECONDARY_FIXED_DIM = field(default_factory=lambda: SchemeColor("secondary_fixed_dim"))
-ON_SECONDARY_FIXED = field(default_factory=lambda: SchemeColor("on_secondary_fixed"))
-ON_SECONDARY_FIXED_VARIANT = field(
-    default_factory=lambda: SchemeColor("on_secondary_fixed_variant")
-)
-TERTIARY_FIXED = field(default_factory=lambda: SchemeColor("tertiary_fixed"))
-TERTIARY_FIXED_DIM = field(default_factory=lambda: SchemeColor("tertiary_fixed_dim"))
-ON_TERTIARY_FIXED = field(default_factory=lambda: SchemeColor("on_tertiary_fixed"))
-ON_TERTIARY_FIXED_VARIANT = field(
-    default_factory=lambda: SchemeColor("on_tertiary_fixed_variant")
-)
+BACKGROUND = SchemeColor(ColorRole.BACKGROUND)
+SURFACE = SchemeColor(ColorRole.SURFACE)
+SURFACE_DIM = SchemeColor(ColorRole.SURFACE_DIM)
+SURFACE_BRIGHT = SchemeColor(ColorRole.SURFACE_BRIGHT)
+SURFACE_CONTAINER_LOWEST = SchemeColor(ColorRole.SURFACE_CONTAINER_LOWEST)
+SURFACE_CONTAINER_LOW = SchemeColor(ColorRole.SURFACE_CONTAINER_LOW)
+SURFACE_CONTAINER = SchemeColor(ColorRole.SURFACE_CONTAINER)
+SURFACE_CONTAINER_HIGH = SchemeColor(ColorRole.SURFACE_CONTAINER_HIGH)
+SURFACE_CONTAINER_HIGHEST = SchemeColor(ColorRole.SURFACE_CONTAINER_HIGHEST)
+ON_SURFACE = SchemeColor(ColorRole.ON_SURFACE)
+SURFACE_VARIANT = SchemeColor(ColorRole.SURFACE_VARIANT)
+ON_SURFACE_VARIANT = SchemeColor(ColorRole.ON_SURFACE_VARIANT)
+INVERSE_SURFACE = SchemeColor(ColorRole.INVERSE_SURFACE)
+INVERSE_ON_SURFACE = SchemeColor(ColorRole.INVERSE_ON_SURFACE)
+OUTLINE = SchemeColor(ColorRole.OUTLINE)
+OUTLINE_VARIANT = SchemeColor(ColorRole.OUTLINE_VARIANT)
+SHADOW = SchemeColor(ColorRole.SHADOW)
+SCRIM = SchemeColor(ColorRole.SCRIM)
+SURFACE_TINT = SchemeColor(ColorRole.SURFACE_TINT)
+PRIMARY = SchemeColor(ColorRole.PRIMARY)
+ON_PRIMARY = SchemeColor(ColorRole.ON_PRIMARY)
+PRIMARY_CONTAINER = SchemeColor(ColorRole.PRIMARY_CONTAINER)
+ON_PRIMARY_CONTAINER = SchemeColor(ColorRole.ON_PRIMARY_CONTAINER)
+INVERSE_PRIMARY = SchemeColor(ColorRole.INVERSE_PRIMARY)
+SECONDARY = SchemeColor(ColorRole.SECONDARY)
+ON_SECONDARY = SchemeColor(ColorRole.ON_SECONDARY)
+SECONDARY_CONTAINER = SchemeColor(ColorRole.SECONDARY_CONTAINER)
+ON_SECONDARY_CONTAINER = SchemeColor(ColorRole.ON_SECONDARY_CONTAINER)
+TERTIARY = SchemeColor(ColorRole.TERTIARY)
+ON_TERTIARY = SchemeColor(ColorRole.ON_TERTIARY)
+TERTIARY_CONTAINER = SchemeColor(ColorRole.TERTIARY_CONTAINER)
+ON_TERTIARY_CONTAINER = SchemeColor(ColorRole.ON_TERTIARY_CONTAINER)
+ERROR = SchemeColor(ColorRole.ERROR)
+ON_ERROR = SchemeColor(ColorRole.ON_ERROR)
+ERROR_CONTAINER = SchemeColor(ColorRole.ERROR_CONTAINER)
+ON_ERROR_CONTAINER = SchemeColor(ColorRole.ON_ERROR_CONTAINER)
+PRIMARY_FIXED = SchemeColor(ColorRole.PRIMARY_FIXED)
+PRIMARY_FIXED_DIM = SchemeColor(ColorRole.PRIMARY_FIXED_DIM)
+ON_PRIMARY_FIXED = SchemeColor(ColorRole.ON_PRIMARY_FIXED)
+ON_PRIMARY_FIXED_VARIANT = SchemeColor(ColorRole.ON_PRIMARY_FIXED_VARIANT)
+SECONDARY_FIXED = SchemeColor(ColorRole.SECONDARY_FIXED)
+SECONDARY_FIXED_DIM = SchemeColor(ColorRole.SECONDARY_FIXED_DIM)
+ON_SECONDARY_FIXED = SchemeColor(ColorRole.ON_SECONDARY_FIXED)
+ON_SECONDARY_FIXED_VARIANT = SchemeColor(ColorRole.ON_SECONDARY_FIXED_VARIANT)
+TERTIARY_FIXED = SchemeColor(ColorRole.TERTIARY_FIXED)
+TERTIARY_FIXED_DIM = SchemeColor(ColorRole.TERTIARY_FIXED_DIM)
+ON_TERTIARY_FIXED = SchemeColor(ColorRole.ON_TERTIARY_FIXED)
+ON_TERTIARY_FIXED_VARIANT = SchemeColor(ColorRole.ON_TERTIARY_FIXED_VARIANT)

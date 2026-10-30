@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+
+tests/photos
+tests/rendered_examples
