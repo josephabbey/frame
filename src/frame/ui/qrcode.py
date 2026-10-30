@@ -15,7 +15,7 @@ class QRCode(Element):
 
     def draw(self, draw: ImageDraw, x: int, y: int, width: int, height: int):
         qr = qrcode.QRCode(
-            version=self.version, error_correction=self.error_correction, box_size=width
+            version=self.version, error_correction=self.error_correction, box_size=1
         )
         qr.add_data(self.data)
         qr.make(fit=True)
