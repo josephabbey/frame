@@ -3,7 +3,8 @@
 Render the built-in photo samples with:
     uv run python tests/example_layouts.py
 
-Select photos by filename and layouts by name with:
+The examples include full_bleed, gallery_triptych, editorial, side_by_side,
+memory_grid, and daily_digest. Select photos and layouts by name with:
     uv run python tests/example_layouts.py --photos IMG_0977~2.jpg IMG_1318.HEIC \
         --layouts full_bleed editorial
 
@@ -18,6 +19,7 @@ from material_color_utilities import Variant, theme_from_image
 from PIL import Image as PILImage
 
 from frame.ui import (
+    PRIMARY_CONTAINER,
     SHAPE_ARCH_LARGE,
     SHAPE_EXTRA_LARGE,
     SHAPE_MEDIUM,
@@ -25,6 +27,7 @@ from frame.ui import (
     SPACE_150,
     SPACE_175,
     SPACE_200,
+    SPACE_250,
     SPACE_300,
     SPACE_400,
     Card,
@@ -179,10 +182,186 @@ def editorial(photos: list[Path], scheme):
     )
 
 
+def side_by_side(photos: list[Path], scheme):
+    """A quiet split composition with a photo and a bold color panel."""
+    return Row(
+        scheme=scheme,
+        padding=SPACE_300,
+        gap=SPACE_300,
+        weights=[3, 2],
+        children=[
+            Image(
+                scheme=scheme,
+                source=photos[0],
+                fit=ImageFit.COVER,
+                focal_point=(0.5, 0.45),
+                shape=SHAPE_EXTRA_LARGE,
+            ),
+            Card(
+                scheme=scheme,
+                bgcolor=PRIMARY_CONTAINER,
+                content_padding=SPACE_300,
+                children=[
+                    Text(
+                        scheme=scheme,
+                        text="FRIDAY, JUNE 14",
+                        role=TypographyRole.LABEL_LARGE,
+                    ),
+                    Text(
+                        scheme=scheme,
+                        text="Somewhere beautiful",
+                        role=TypographyRole.HEADLINE_MEDIUM,
+                        emphasized=True,
+                    ),
+                    Text(
+                        scheme=scheme,
+                        text="A little space to slow down and take it all in.",
+                        role=TypographyRole.BODY_LARGE,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def memory_grid(photos: list[Path], scheme):
+    """A four-photo grid with a simple title bar."""
+    return Column(
+        scheme=scheme,
+        padding=SPACE_300,
+        gap=SPACE_200,
+        main_sizes=[64, None],
+        children=[
+            Row(
+                scheme=scheme,
+                children=[
+                    Text(
+                        scheme=scheme,
+                        text="Collected moments",
+                        role=TypographyRole.HEADLINE_SMALL,
+                        emphasized=True,
+                    ),
+                    Text(
+                        scheme=scheme,
+                        text="SUMMER 2025",
+                        role=TypographyRole.LABEL_LARGE,
+                        align=TextAlign.RIGHT,
+                    ),
+                ],
+                weights=[1, 1],
+            ),
+            Column(
+                scheme=scheme,
+                gap=SPACE_150,
+                weights=[1, 1],
+                children=[
+                    Row(
+                        scheme=scheme,
+                        gap=SPACE_150,
+                        weights=[1, 1],
+                        children=[
+                            Image(
+                                scheme=scheme,
+                                source=photos[0],
+                                fit=ImageFit.COVER,
+                                shape=SHAPE_MEDIUM,
+                            ),
+                            Image(
+                                scheme=scheme,
+                                source=photos[1 % len(photos)],
+                                fit=ImageFit.COVER,
+                                shape=SHAPE_MEDIUM,
+                            ),
+                        ],
+                    ),
+                    Row(
+                        scheme=scheme,
+                        gap=SPACE_150,
+                        weights=[1, 1],
+                        children=[
+                            Image(
+                                scheme=scheme,
+                                source=photos[2 % len(photos)],
+                                fit=ImageFit.COVER,
+                                shape=SHAPE_MEDIUM,
+                            ),
+                            Image(
+                                scheme=scheme,
+                                source=photos[3 % len(photos)],
+                                fit=ImageFit.COVER,
+                                shape=SHAPE_MEDIUM,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def daily_digest(photos: list[Path], scheme):
+    """A compact photo-led dashboard with a small supporting image."""
+    return Row(
+        scheme=scheme,
+        padding=SPACE_300,
+        gap=SPACE_250,
+        weights=[3, 2],
+        children=[
+            Image(
+                scheme=scheme,
+                source=photos[0],
+                fit=ImageFit.COVER,
+                focal_point=(0.5, 0.42),
+                shape=SHAPE_EXTRA_LARGE,
+            ),
+            Column(
+                scheme=scheme,
+                gap=SPACE_150,
+                main_sizes=[None, 96],
+                children=[
+                    Card(
+                        scheme=scheme,
+                        content_padding=SPACE_250,
+                        children=[
+                            Text(
+                                scheme=scheme,
+                                text="MONDAY",
+                                role=TypographyRole.LABEL_LARGE,
+                            ),
+                            Text(
+                                scheme=scheme,
+                                text="08:42",
+                                role=TypographyRole.DISPLAY_MEDIUM,
+                                emphasized=True,
+                                tabular_numbers=True,
+                            ),
+                            Text(
+                                scheme=scheme,
+                                text="A good day to get outside",
+                                role=TypographyRole.TITLE_MEDIUM,
+                            ),
+                        ],
+                    ),
+                    Image(
+                        scheme=scheme,
+                        source=photos[1 % len(photos)],
+                        fit=ImageFit.COVER,
+                        focal_point=(0.5, 0.5),
+                        shape=SHAPE_MEDIUM,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
 EXAMPLES = {
     "full_bleed": full_bleed,
     "gallery_triptych": gallery_triptych,
     "editorial": editorial,
+    "side_by_side": side_by_side,
+    "memory_grid": memory_grid,
+    "daily_digest": daily_digest,
 }
 
 PHOTO_DIR = Path(__file__).parent / "photos"
