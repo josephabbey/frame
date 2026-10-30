@@ -1,5 +1,4 @@
-from inky.auto import auto
-from inky.inky import Inky
+from inky import Inky_Impressions_7
 from material_color_utilities import theme_from_color
 
 from frame.ui import QRCode, render
@@ -14,7 +13,7 @@ def debug():
 
 
 def display():
-    output: Inky = auto()
+    output = Inky_Impressions_7()
     output.set_border(output.WHITE)
     output.set_image(render(layout, width=output.width, height=output.height))
     output.show()
