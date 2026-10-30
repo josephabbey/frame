@@ -1,4 +1,4 @@
-from .display import display,debug
+from .display import debug, display
 
 
 def main():
@@ -8,4 +8,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-__all__ = ["display", "debug", "main"]
+__all__ = ["debug", "display", "main"]

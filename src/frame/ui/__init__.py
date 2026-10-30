@@ -1,11 +1,11 @@
 from .box import Box
 from .element import Element
-from .render import render
 from .qrcode import QRCode
+from .render import render
 
 __all__ = [
-  "Box",
-  "Element",
-  "render",
-  "QRCode",
+    "Box",
+    "Element",
+    "QRCode",
+    "render",
 ]
