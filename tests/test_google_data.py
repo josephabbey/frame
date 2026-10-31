@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 
 from frame.data import OAuthToken
-from frame.data.google import (
+from frame.google import (
     GoogleAccountAPI,
     GoogleCalendarAPI,
     GoogleOAuthConfig,

@@ -37,7 +37,9 @@ class GooglePhotosAPI(GoogleClient, PhotosAPI):
             body["albumId"] = album_id
         if limit:
             body["pageSize"] = limit
-        payload = await self.request("POST", f"{_BASE_URL}/mediaItems:search", json=body)
+        payload = await self.request(
+            "POST", f"{_BASE_URL}/mediaItems:search", json=body
+        )
         return tuple(
             self._photo_from_payload(item, album_id)
             for item in payload.get("mediaItems", [])

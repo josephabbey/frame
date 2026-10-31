@@ -1,5 +1,6 @@
 """Google OAuth and account implementation of :class:`frame.data.AccountAPI`."""
 
+import dataclasses
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -7,7 +8,8 @@ from urllib.parse import urlencode
 
 from frame.data.account import Account, AccountAPI, OAuthToken
 
-from .client import GoogleClient, GoogleOAuthConfig, GoogleTransport
+from .client import GoogleClient, GoogleOAuthConfig
+from .transport import GoogleTransport
 
 _AUTHORIZATION_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 _TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -49,7 +51,9 @@ class GoogleAccountAPI(GoogleClient, AccountAPI):
         return Account(
             id=str(payload["sub"]),
             provider="google",
-            display_name=str(payload.get("name") or payload.get("email", "Google user")),
+            display_name=str(
+                payload.get("name") or payload.get("email", "Google user")
+            ),
             email=payload.get("email"),
             avatar_url=payload.get("picture"),
         )
@@ -70,7 +74,7 @@ class GoogleAccountAPI(GoogleClient, AccountAPI):
         )
 
     async def refresh_token(self, refresh_token: str) -> OAuthToken:
-        return await self._token_from_payload(
+        token = await self._token_from_payload(
             await self.transport.request(
                 "POST",
                 _TOKEN_URL,
@@ -82,6 +86,9 @@ class GoogleAccountAPI(GoogleClient, AccountAPI):
                 },
             )
         )
+        if token.refresh_token is None:
+            return dataclasses.replace(token, refresh_token=refresh_token)
+        return token
 
     @staticmethod
     async def _token_from_payload(payload: Mapping[str, Any]) -> OAuthToken:
