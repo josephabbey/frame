@@ -5,6 +5,24 @@ It uses logical display pixels, supersampled drawing for smoother text and
 rounded geometry, and a seven-color output palette with optional dithering for
 photographs.
 
+## Data contracts
+
+`frame.data` contains provider-neutral, immutable structures for calendar,
+tasks, photos, weather, and account/OAuth data. Each domain exposes an async
+`*API` protocol for a provider implementation to satisfy, without coupling the
+display layer to a particular service or HTTP client.
+
+```python
+from frame.data import CalendarAPI, Task, Weather
+
+# Implement CalendarAPI, TasksAPI, PhotosAPI, WeatherAPI, or AccountAPI for
+# the services used by a frame installation.
+```
+
+Google implementations live in `frame.data.google`. Supply a `GoogleTransport`
+backed by the application's async HTTP client, an OAuth token for Calendar,
+Tasks, Photos, and account calls, and a Maps Weather API key for weather calls.
+
 ```python
 from material_color_utilities import theme_from_color
 from frame.ui import (
