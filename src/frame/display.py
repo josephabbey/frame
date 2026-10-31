@@ -1,11 +1,11 @@
 from inky import Inky_Impressions_7
-from material_color_utilities import theme_from_color
 
-from frame.ui import QRCode, render
+from frame.flow.settings import FlowSettingsStore
+from frame.layout import PairingLayout
+from frame.ui import render
 
-layout = QRCode(
-    scheme=theme_from_color("#f00").schemes.light, data="https://josephabbey.dev"
-)
+_store = FlowSettingsStore()
+layout = PairingLayout(_store.current)
 
 
 def debug():

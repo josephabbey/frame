@@ -62,7 +62,9 @@ class GoogleCalendarAPI(GoogleClient, CalendarAPI):
         return tuple(events)
 
     @staticmethod
-    def _event_from_payload(payload: Mapping[str, Any], calendar_id: str) -> CalendarEvent:
+    def _event_from_payload(
+        payload: Mapping[str, Any], calendar_id: str
+    ) -> CalendarEvent:
         starts_at, all_day = _event_time(payload["start"])
         ends_at, _ = _event_time(payload["end"])
         return CalendarEvent(

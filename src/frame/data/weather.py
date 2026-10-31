@@ -57,6 +57,4 @@ class WeatherAPI(ABC):
     """The provider-facing operation required by weather displays."""
 
     @abstractmethod
-    async def get_weather(
-        self, location: Location, *, days: int = 5
-    ) -> Weather: ...
+    async def get_weather(self, location: Location, *, days: int = 5) -> Weather: ...

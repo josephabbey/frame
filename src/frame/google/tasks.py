@@ -41,7 +41,11 @@ class GoogleTasksAPI(GoogleClient, TasksAPI):
                     id=str(item["id"]),
                     list_id=list_id,
                     title=str(item.get("title", "")),
-                    status=TaskStatus(item.get("status", "needsAction").replace("needsAction", "needs_action")),
+                    status=TaskStatus(
+                        item.get("status", "needsAction").replace(
+                            "needsAction", "needs_action"
+                        )
+                    ),
                     due_at=_timestamp(item.get("due")),
                     completed_at=_timestamp(item.get("completed")),
                     priority=TaskPriority.MEDIUM,

@@ -1,29 +1,12 @@
-"""Shared primitives for Google API adapters.
-
-The transport is intentionally injected so applications can use ``httpx``,
-``aiohttp``, or their own retrying transport without coupling this package to
-one HTTP dependency.
-"""
+"""Shared primitives for Google API adapters."""
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any
 
 from frame.data.account import OAuthToken
 
-
-class GoogleTransport(Protocol):
-    """Minimal JSON transport used by the Google provider adapters."""
-
-    async def request(
-        self,
-        method: str,
-        url: str,
-        *,
-        headers: Mapping[str, str] | None = None,
-        params: Mapping[str, str] | None = None,
-        json: Mapping[str, Any] | None = None,
-    ) -> Mapping[str, Any]: ...
+from .transport import GoogleTransport
 
 
 @dataclass(frozen=True, slots=True)

@@ -13,7 +13,7 @@ from frame.data.weather import (
     WeatherCondition,
 )
 
-from .client import GoogleTransport
+from .transport import GoogleTransport
 
 _BASE_URL = "https://weather.googleapis.com/v1"
 
@@ -45,7 +45,9 @@ def _condition(value: Mapping[str, Any] | None) -> WeatherCondition:
 
 
 def _degrees(value: Mapping[str, Any] | None) -> float | None:
-    return float(value["degrees"]) if value and value.get("degrees") is not None else None
+    return (
+        float(value["degrees"]) if value and value.get("degrees") is not None else None
+    )
 
 
 class GoogleWeatherAPI(WeatherAPI):
@@ -62,7 +64,10 @@ class GoogleWeatherAPI(WeatherAPI):
         }
         headers = {"x-goog-api-key": self.api_key}
         current_payload = await self.transport.request(
-            "GET", f"{_BASE_URL}/currentConditions:lookup", headers=headers, params=params
+            "GET",
+            f"{_BASE_URL}/currentConditions:lookup",
+            headers=headers,
+            params=params,
         )
         forecast_payload = await self.transport.request(
             "GET",
@@ -82,15 +87,21 @@ class GoogleWeatherAPI(WeatherAPI):
     @staticmethod
     def _current_from_payload(payload: Mapping[str, Any]) -> CurrentWeather:
         return CurrentWeather(
-            observed_at=_timestamp(str(payload.get("currentTime", datetime.now(UTC).isoformat()))),
+            observed_at=_timestamp(
+                str(payload.get("currentTime", datetime.now(UTC).isoformat()))
+            ),
             temperature_c=float(payload["temperature"]["degrees"]),
             condition=_condition(payload.get("weatherCondition")),
             feels_like_c=_degrees(payload.get("feelsLikeTemperature")),
             humidity_percent=(
-                int(payload["relativeHumidity"]) if payload.get("relativeHumidity") else None
+                int(payload["relativeHumidity"])
+                if payload.get("relativeHumidity")
+                else None
             ),
             wind_speed_kph=_degrees(payload.get("wind", {}).get("speed")),
-            precipitation_probability=payload.get("precipitationProbability", {}).get("percent"),
+            precipitation_probability=payload.get("precipitationProbability", {}).get(
+                "percent"
+            ),
         )
 
     @staticmethod
@@ -98,7 +109,9 @@ class GoogleWeatherAPI(WeatherAPI):
         interval = payload.get("interval", {})
         return DailyForecast(
             date=date.fromisoformat(str(interval.get("startTime", "1970-01-01"))[:10]),
-            condition=_condition(payload.get("daytimeForecast", {}).get("weatherCondition")),
+            condition=_condition(
+                payload.get("daytimeForecast", {}).get("weatherCondition")
+            ),
             high_c=float(payload["maxTemperature"]["degrees"]),
             low_c=float(payload["minTemperature"]["degrees"]),
             precipitation_probability=payload.get("daytimeForecast", {})
