@@ -3,20 +3,18 @@ name = "frame"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-  { name = "Joseph Abbey", email = "me@josephabbey.dev" }
-]
+authors = [{ name = "Joseph Abbey", email = "me@josephabbey.dev" }]
 requires-python = ">=3.14"
 dependencies = [
-    "inky>=2.6.0",
-    "material-color-utilities>=0.2.6",
-    "pillow>=13.0.0",
-    "qrcode[pil]>=8.2",
+  "dacite>=1.9.2",
+  "inky>=2.6.0",
+  "material-color-utilities>=0.2.6",
+  "pillow>=13.0.0",
+  "qrcode[pil]>=8.2",
 ]
 
 [project.scripts]
-frame = "frame:main"
-display = "frame:display"
+frame = "frame:display"
 debug = "frame:debug"
 
 [build-system]
@@ -24,7 +22,7 @@ requires = ["uv_build>=0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "ruff>=0.17.3",
-    "ty>=0.0.95",
-]
+dev = ["ruff>=0.17.3", "ty>=0.0.95"]
+
+[tool.ruff]
+indent-width = 2

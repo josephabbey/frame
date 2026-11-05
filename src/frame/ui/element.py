@@ -10,13 +10,13 @@ from .spacing import M3_SPACING, Spacing
 
 @dataclass(kw_only=True)
 class Element(ABC):
-    """A noninteractive drawable in logical (native display pixel) units."""
+  """A noninteractive drawable in logical (native display pixel) units."""
 
-    scheme: DynamicScheme
-    bgcolor: Color = BACKGROUND
-    fgcolor: Color = ON_SURFACE
-    spacing: Spacing = M3_SPACING
+  scheme: DynamicScheme
+  bgcolor: Color = BACKGROUND
+  fgcolor: Color = ON_SURFACE
+  spacing: Spacing = M3_SPACING
 
-    @abstractmethod
-    def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
-        """Draw into the high-resolution render surface."""
+  @abstractmethod
+  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+    """Draw into the high-resolution render surface."""

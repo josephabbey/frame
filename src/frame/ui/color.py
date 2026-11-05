@@ -8,76 +8,76 @@ ColorValue = str | int | tuple[int, ...]
 
 
 class ColorRole(StrEnum):
-    BACKGROUND = "background"
-    SURFACE = "surface"
-    SURFACE_DIM = "surface_dim"
-    SURFACE_BRIGHT = "surface_bright"
-    SURFACE_CONTAINER_LOWEST = "surface_container_lowest"
-    SURFACE_CONTAINER_LOW = "surface_container_low"
-    SURFACE_CONTAINER = "surface_container"
-    SURFACE_CONTAINER_HIGH = "surface_container_high"
-    SURFACE_CONTAINER_HIGHEST = "surface_container_highest"
-    ON_SURFACE = "on_surface"
-    SURFACE_VARIANT = "surface_variant"
-    ON_SURFACE_VARIANT = "on_surface_variant"
-    INVERSE_SURFACE = "inverse_surface"
-    INVERSE_ON_SURFACE = "inverse_on_surface"
-    OUTLINE = "outline"
-    OUTLINE_VARIANT = "outline_variant"
-    SHADOW = "shadow"
-    SCRIM = "scrim"
-    SURFACE_TINT = "surface_tint"
-    PRIMARY = "primary"
-    ON_PRIMARY = "on_primary"
-    PRIMARY_CONTAINER = "primary_container"
-    ON_PRIMARY_CONTAINER = "on_primary_container"
-    INVERSE_PRIMARY = "inverse_primary"
-    SECONDARY = "secondary"
-    ON_SECONDARY = "on_secondary"
-    SECONDARY_CONTAINER = "secondary_container"
-    ON_SECONDARY_CONTAINER = "on_secondary_container"
-    TERTIARY = "tertiary"
-    ON_TERTIARY = "on_tertiary"
-    TERTIARY_CONTAINER = "tertiary_container"
-    ON_TERTIARY_CONTAINER = "on_tertiary_container"
-    ERROR = "error"
-    ON_ERROR = "on_error"
-    ERROR_CONTAINER = "error_container"
-    ON_ERROR_CONTAINER = "on_error_container"
-    PRIMARY_FIXED = "primary_fixed"
-    PRIMARY_FIXED_DIM = "primary_fixed_dim"
-    ON_PRIMARY_FIXED = "on_primary_fixed"
-    ON_PRIMARY_FIXED_VARIANT = "on_primary_fixed_variant"
-    SECONDARY_FIXED = "secondary_fixed"
-    SECONDARY_FIXED_DIM = "secondary_fixed_dim"
-    ON_SECONDARY_FIXED = "on_secondary_fixed"
-    ON_SECONDARY_FIXED_VARIANT = "on_secondary_fixed_variant"
-    TERTIARY_FIXED = "tertiary_fixed"
-    TERTIARY_FIXED_DIM = "tertiary_fixed_dim"
-    ON_TERTIARY_FIXED = "on_tertiary_fixed"
-    ON_TERTIARY_FIXED_VARIANT = "on_tertiary_fixed_variant"
+  BACKGROUND = "background"
+  SURFACE = "surface"
+  SURFACE_DIM = "surface_dim"
+  SURFACE_BRIGHT = "surface_bright"
+  SURFACE_CONTAINER_LOWEST = "surface_container_lowest"
+  SURFACE_CONTAINER_LOW = "surface_container_low"
+  SURFACE_CONTAINER = "surface_container"
+  SURFACE_CONTAINER_HIGH = "surface_container_high"
+  SURFACE_CONTAINER_HIGHEST = "surface_container_highest"
+  ON_SURFACE = "on_surface"
+  SURFACE_VARIANT = "surface_variant"
+  ON_SURFACE_VARIANT = "on_surface_variant"
+  INVERSE_SURFACE = "inverse_surface"
+  INVERSE_ON_SURFACE = "inverse_on_surface"
+  OUTLINE = "outline"
+  OUTLINE_VARIANT = "outline_variant"
+  SHADOW = "shadow"
+  SCRIM = "scrim"
+  SURFACE_TINT = "surface_tint"
+  PRIMARY = "primary"
+  ON_PRIMARY = "on_primary"
+  PRIMARY_CONTAINER = "primary_container"
+  ON_PRIMARY_CONTAINER = "on_primary_container"
+  INVERSE_PRIMARY = "inverse_primary"
+  SECONDARY = "secondary"
+  ON_SECONDARY = "on_secondary"
+  SECONDARY_CONTAINER = "secondary_container"
+  ON_SECONDARY_CONTAINER = "on_secondary_container"
+  TERTIARY = "tertiary"
+  ON_TERTIARY = "on_tertiary"
+  TERTIARY_CONTAINER = "tertiary_container"
+  ON_TERTIARY_CONTAINER = "on_tertiary_container"
+  ERROR = "error"
+  ON_ERROR = "on_error"
+  ERROR_CONTAINER = "error_container"
+  ON_ERROR_CONTAINER = "on_error_container"
+  PRIMARY_FIXED = "primary_fixed"
+  PRIMARY_FIXED_DIM = "primary_fixed_dim"
+  ON_PRIMARY_FIXED = "on_primary_fixed"
+  ON_PRIMARY_FIXED_VARIANT = "on_primary_fixed_variant"
+  SECONDARY_FIXED = "secondary_fixed"
+  SECONDARY_FIXED_DIM = "secondary_fixed_dim"
+  ON_SECONDARY_FIXED = "on_secondary_fixed"
+  ON_SECONDARY_FIXED_VARIANT = "on_secondary_fixed_variant"
+  TERTIARY_FIXED = "tertiary_fixed"
+  TERTIARY_FIXED_DIM = "tertiary_fixed_dim"
+  ON_TERTIARY_FIXED = "on_tertiary_fixed"
+  ON_TERTIARY_FIXED_VARIANT = "on_tertiary_fixed_variant"
 
 
 class Color(ABC):
-    @abstractmethod
-    def __call__(self, scheme: DynamicScheme) -> str:
-        raise NotImplementedError
+  @abstractmethod
+  def __call__(self, scheme: DynamicScheme) -> str:
+    raise NotImplementedError
 
 
 @dataclass(frozen=True)
 class HexColor(Color):
-    value: str
+  value: str
 
-    def __call__(self, scheme: DynamicScheme) -> str:
-        return self.value
+  def __call__(self, scheme: DynamicScheme) -> str:
+    return self.value
 
 
 @dataclass(frozen=True)
 class SchemeColor(Color):
-    role: ColorRole
+  role: ColorRole
 
-    def __call__(self, scheme: DynamicScheme) -> str:
-        return getattr(scheme, self.role.value)
+  def __call__(self, scheme: DynamicScheme) -> str:
+    return getattr(scheme, self.role.value)
 
 
 BACKGROUND = SchemeColor(ColorRole.BACKGROUND)

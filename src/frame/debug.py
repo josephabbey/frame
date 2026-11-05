@@ -1,0 +1,11 @@
+from material_color_utilities import theme_from_color
+
+from frame.ui import QRCode, render
+
+layout = QRCode(
+  scheme=theme_from_color("#f00").schemes.light, data="https://josephabbey.dev"
+)
+
+
+def debug():
+  render(layout, width=800, height=480).show()

@@ -1,11 +1,9 @@
-from .display import debug, display
+from .debug import debug
+from .display import display
+from .settings import Settings
 
-
-def main():
-    print("Hello from frame!")
-
-
-if __name__ == "__main__":
-    main()
-
-__all__ = ["debug", "display", "main"]
+__all__ = [
+  "Settings",
+  "debug",
+  "display",
+]

@@ -57,4 +57,7 @@ def test_oauth_token_expiry_uses_the_token_timezone():
 
 
 def test_provider_contracts_require_an_implementation():
-    assert all(isabstract(api) for api in (AccountAPI, CalendarAPI, PhotosAPI, TasksAPI, WeatherAPI))
+    assert all(
+        isabstract(api)
+        for api in (AccountAPI, CalendarAPI, PhotosAPI, TasksAPI, WeatherAPI)
+    )
