@@ -16,16 +16,13 @@ class Account:
 
 @dataclass(frozen=True, slots=True)
 class OAuthToken:
-  """A token set returned by an OAuth provider.
-
-  ``refresh_token`` should only be persisted in a secure credential store.
-  """
+  """A token set returned by an OAuth provider."""
 
   access_token: str
   token_type: str
   expires_at: datetime | None = None
   refresh_token: str | None = None
-  scopes: tuple[str, ...] = field(default_factory=tuple)
+  scopes: set[str] = field(default_factory=set)
 
   @property
   def is_expired(self) -> bool:
@@ -39,6 +36,9 @@ class AccountAPI(ABC):
 
   @abstractmethod
   async def get_account(self) -> Account: ...
+
+  @abstractmethod
+  def authorization_url(self) -> str: ...
 
   @abstractmethod
   async def refresh_token(self) -> OAuthToken: ...

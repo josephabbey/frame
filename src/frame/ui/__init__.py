@@ -56,7 +56,17 @@ from .color import (
 )
 from .element import Element
 from .image import Image, ImageFit, ImageSource
-from .layout import Alignment, Axis, Center, Column, Padding, Row, Spacer, Stack
+from .layout import (
+  Alignment,
+  Axis,
+  Center,
+  Column,
+  Padding,
+  PaddingSides,
+  Row,
+  Spacer,
+  Stack,
+)
 from .qrcode import QRCode
 from .render import render
 from .shapes import (
@@ -200,6 +210,7 @@ __all__ = [
   "ImageFit",
   "ImageSource",
   "Padding",
+  "PaddingSides",
   "QRCode",
   "RoundedBox",
   "Row",

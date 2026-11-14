@@ -14,7 +14,7 @@ class QRCode(Element):
   error_correction = qrcode.constants.ERROR_CORRECT_L
   quiet_zone: int = 4
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     if width <= 0 or height <= 0:
       return
     qr = qrcode.QRCode(

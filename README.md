@@ -1,5 +1,7 @@
 # Frame
 
+REQUIRES RAQM
+
 A small, noninteractive PIL interface toolkit for Inky Impression photo frames.
 It uses logical display pixels, supersampled drawing for smoother text and
 rounded geometry, and a seven-color output palette with optional dithering for
@@ -26,38 +28,38 @@ Tasks, Photos, and account calls, and a Maps Weather API key for weather calls.
 ```python
 from material_color_utilities import theme_from_color
 from frame.ui import (
-    SPACE_200,
-    SPACE_300,
-    Card,
-    Column,
-    Image,
-    ImageFit,
-    Text,
-    TypographyRole,
-    render,
+  SPACE_200,
+  SPACE_300,
+  Card,
+  Column,
+  Image,
+  ImageFit,
+  Text,
+  TypographyRole,
+  render,
 )
 
 scheme = theme_from_color("#6750a4").schemes.light
 screen = Column(
-    scheme=scheme,
-    padding=SPACE_300,
-    gap=SPACE_200,
-    main_sizes=[None, 70],
-    children=[
-        Image(scheme=scheme, source="photos/favourite.jpg", fit=ImageFit.COVER),
-        Card(
-            scheme=scheme,
-            radius=28,
-            children=[
-                Text(
-                    scheme=scheme,
-                    text="A favourite moment",
-                    role=TypographyRole.TITLE_LARGE,
-                    emphasized=True,
-                )
-            ],
-        ),
-    ],
+  scheme=scheme,
+  padding=SPACE_300,
+  gap=SPACE_200,
+  main_sizes=[None, 70],
+  children=[
+    Image(scheme=scheme, source="photos/favourite.jpg", fit=ImageFit.COVER),
+    Card(
+      scheme=scheme,
+      radius=28,
+      children=[
+        Text(
+          scheme=scheme,
+          text="A favourite moment",
+          role=TypographyRole.TITLE_LARGE,
+          emphasized=True,
+        )
+      ],
+    ),
+  ],
 )
 output = render(screen, width=800, height=480)
 output.save("frame.png")

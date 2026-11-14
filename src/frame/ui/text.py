@@ -94,7 +94,7 @@ class Text(Element):
   valign: VerticalAlign = VerticalAlign.MIDDLE
   max_lines: int | None = None
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     scale = draw.frame_scale
     token = (self.type_scale or MATERIAL_3_TYPE_SCALE)[self.role]
     px_size = max(1, (self.size or token.size) * scale)

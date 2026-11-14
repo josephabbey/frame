@@ -28,7 +28,7 @@ from frame.ui import (
 from frame.utils.image import image_from_url
 
 
-def full_bleed(
+async def full_bleed(
   photos: Sequence[Photo],
   scheme: DynamicScheme,
   *,
@@ -37,7 +37,9 @@ def full_bleed(
 ) -> Element:
   """A borderless photograph with a calm caption band below it."""
   # override scheme
-  scheme = theme_from_image(img=image_from_url(photos[0].source_url)).schemes.light
+  scheme = theme_from_image(
+    img=await image_from_url(photos[0].source_url)
+  ).schemes.light
   return Column(
     scheme=scheme,
     padding=SPACE_300,
@@ -73,7 +75,7 @@ def full_bleed(
   )
 
 
-def gallery_triptych(
+async def gallery_triptych(
   photos: Sequence[Photo],
   scheme: DynamicScheme,
   *,
@@ -126,7 +128,7 @@ def gallery_triptych(
   )
 
 
-def editorial(
+async def editorial(
   photos: Sequence[Photo],
   scheme: DynamicScheme,
   *,

@@ -11,3 +11,5 @@ wheels/
 
 tests/photos
 tests/rendered_examples
+
+output.png

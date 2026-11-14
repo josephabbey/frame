@@ -24,7 +24,7 @@ class Spacer(Element):
 
   flex_weight: float = 1
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     pass
 
 
@@ -41,7 +41,7 @@ class Stack(Element):
   weights: list[float] | None = None
   main_sizes: list[int | None] | None = None
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     if not self.children:
       return
     vertical = self.axis == Axis.VERTICAL
@@ -95,9 +95,9 @@ class Stack(Element):
         elif self.cross_align == Alignment.END:
           cross_offset += cross_size - child_cross
       if vertical:
-        child.draw(draw, x + cross_offset, y + cursor, child_cross, child_main)
+        await child.draw(draw, x + cross_offset, y + cursor, child_cross, child_main)
       else:
-        child.draw(draw, x + cursor, y + cross_offset, child_main, child_cross)
+        await child.draw(draw, x + cursor, y + cross_offset, child_main, child_cross)
       cursor += child_main + gap
 
 
@@ -116,9 +116,9 @@ class Padding(Element):
   child: Element
   inset: int | SpacingToken = SPACE_200
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     inset = max(0, self.spacing.resolve(self.inset) * draw.frame_scale)
-    self.child.draw(
+    await self.child.draw(
       draw,
       x + inset,
       y + inset,
@@ -128,18 +128,40 @@ class Padding(Element):
 
 
 @dataclass(kw_only=True)
+class PaddingSides(Element):
+  child: Element
+  inset_left: int | SpacingToken = SPACE_200
+  inset_top: int | SpacingToken = SPACE_200
+  inset_right: int | SpacingToken = SPACE_200
+  inset_bottom: int | SpacingToken = SPACE_200
+
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+    inset_left = max(0, self.spacing.resolve(self.inset_left) * draw.frame_scale)
+    inset_top = max(0, self.spacing.resolve(self.inset_top) * draw.frame_scale)
+    inset_right = max(0, self.spacing.resolve(self.inset_right) * draw.frame_scale)
+    inset_bottom = max(0, self.spacing.resolve(self.inset_bottom) * draw.frame_scale)
+    await self.child.draw(
+      draw,
+      x + inset_left,
+      y + inset_top,
+      max(0, width - 2 * inset_right),
+      max(0, height - 2 * inset_bottom),
+    )
+
+
+@dataclass(kw_only=True)
 class Center(Element):
   child: Element
   width: int | None = None
   height: int | None = None
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     scale = draw.frame_scale
     child_width = min(width, self.width * scale) if self.width is not None else width
     child_height = (
       min(height, self.height * scale) if self.height is not None else height
     )
-    self.child.draw(
+    await self.child.draw(
       draw,
       x + (width - child_width) // 2,
       y + (height - child_height) // 2,

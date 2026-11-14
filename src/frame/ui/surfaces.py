@@ -18,7 +18,7 @@ class RoundedBox(Element):
   outline: Color | None = None
   outline_width: int = 0
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     if width <= 0 or height <= 0:
       return
     scale = draw.frame_scale
@@ -52,9 +52,9 @@ class Card(RoundedBox):
   children: list[Element] = field(default_factory=list)
   content_padding: int | SpacingToken = SPACE_200
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
-    super().draw(draw, x, y, width, height)
-    Column(
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+    await super().draw(draw, x, y, width, height)
+    await Column(
       scheme=self.scheme,
       spacing=self.spacing,
       children=self.children,

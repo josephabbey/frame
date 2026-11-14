@@ -18,5 +18,5 @@ class Element(ABC):
   spacing: Spacing = M3_SPACING
 
   @abstractmethod
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     """Draw into the high-resolution render surface."""

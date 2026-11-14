@@ -29,7 +29,7 @@ class Image(Element):
   focal_point: tuple[float, float] = (0.5, 0.5)
   shape: Shape | None = None
 
-  def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
+  async def draw(self, draw: Drawing, x: int, y: int, width: int, height: int) -> None:
     if width <= 0 or height <= 0:
       return
     image = (
@@ -37,7 +37,7 @@ class Image(Element):
       if isinstance(self.source, PILImage.Image)
       else PILImage.open(self.source)
       if isinstance(self.source, Path)
-      else image_from_url(self.source)
+      else await image_from_url(self.source)
     )
     image = image.convert("RGB")
     if self.fit == ImageFit.FILL:

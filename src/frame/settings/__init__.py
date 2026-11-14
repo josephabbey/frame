@@ -1,6 +1,5 @@
 import logging
 import os
-import pickle
 import re
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
@@ -8,6 +7,8 @@ from pathlib import Path
 from typing import Any, cast
 
 from dacite import from_dict
+
+from frame.utils import pickle
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class Settings:
   def load(cls):
     try:
       with cls.path().open("rb") as f:
-        loaded = pickle.load(f)
+        loaded = pickle.load_with_defaults(f)
         logger.info(f"Loaded settings: {cls.name()}")
         if isinstance(loaded, cls):
           return loaded

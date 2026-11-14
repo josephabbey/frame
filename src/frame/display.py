@@ -3,19 +3,21 @@ import logging
 
 from inky import Inky_Impressions_7
 
-from frame.layout import build_layout
+from frame.loop import LOOP
 
 logging.basicConfig(
   level=logging.INFO,
   format="%(asctime)s - %(name)-20s - %(levelname)-8s - %(message)s",
 )
 
+from frame.layout import build_layout
 from frame.ui import render
 
 logger = logging.getLogger(__name__)
 
 
-TODO_PERIOD = 5
+TODO_PERIOD = 1800
+assert TODO_PERIOD > 60  # Avoid overlapping writes
 
 
 async def refresh_loop():
@@ -24,11 +26,10 @@ async def refresh_loop():
   while True:
     layout = await build_layout()
     output.set_image(render(layout, width=output.width, height=output.height))
-    output.show()
+    output.show(busy_wait=False)
     await asyncio.sleep(TODO_PERIOD)
 
 
 def display():
-  loop = asyncio.new_event_loop()
-  loop.create_task(refresh_loop())
-  loop.run_forever()
+  LOOP.create_task(refresh_loop())
+  LOOP.run_forever()
