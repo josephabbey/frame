@@ -14,7 +14,7 @@ _client = httpx.AsyncClient(timeout=30, mounts={"file://": FileTransport()})
 
 
 @dataclass(slots=True, kw_only=True)
-class Client:
+class WebClient:
   async def request_json(
     self,
     method: str,
@@ -88,7 +88,7 @@ class NotAuthenticated(Exception): ...
 
 
 @dataclass(slots=True, kw_only=True)
-class AuthorizedClient(Client):
+class AuthorizedWebClient(WebClient):
   authorized: asyncio.Event = field(default_factory=asyncio.Event)
 
   async def request_json(
@@ -134,4 +134,4 @@ class AuthorizedClient(Client):
     )
 
 
-CLIENT = Client()
+WEB_CLIENT = WebClient()

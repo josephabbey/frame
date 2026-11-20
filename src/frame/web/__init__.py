@@ -1,8 +1,8 @@
-from .client import CLIENT, AuthorizedClient, Client, NotAuthenticated
+from .client import WEB_CLIENT, AuthorizedWebClient, NotAuthenticated, WebClient
 
 __all__ = [
-  "CLIENT",
-  "AuthorizedClient",
-  "Client",
+  "WEB_CLIENT",
+  "AuthorizedWebClient",
   "NotAuthenticated",
+  "WebClient",
 ]

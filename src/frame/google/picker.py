@@ -15,7 +15,7 @@ from frame.utils import timestamp
 
 from .account import ALL_SCOPES
 from .client import GOOGLE_CLIENT
-from .photos import GooglePhotosAPI
+from .photos import GOOGLE_PHOTOS_API
 from .store import GOOGLE_STORE
 
 logger = logging.getLogger(__name__)
@@ -196,7 +196,7 @@ class GooglePhotosPickerSessions:
 GOOGLE_PHOTOS_PICKER_SESSIONS = GooglePhotosPickerSessions()
 
 
-class GooglePhotosPickerAPI(GooglePhotosAPI):
+class GooglePhotosPickerAPI:
   """Add Picker selection and Flow operations to the Library API provider."""
 
   async def create_selection(
@@ -210,7 +210,7 @@ class GooglePhotosPickerAPI(GooglePhotosAPI):
 
     if not 1 <= max_item_count <= DEFAULT_MAX_ITEM_COUNT:
       raise ValueError(f"max_item_count must be between 1 and {DEFAULT_MAX_ITEM_COUNT}")
-    albums = await self.list_albums()
+    albums = await GOOGLE_PHOTOS_API.list_albums()
     existing_album = next((album for album in albums if album.id == album_id), None)
     if album_id and existing_album is None:
       raise ValueError(f"Unknown Google Photos album: {album_id}")
@@ -222,7 +222,7 @@ class GooglePhotosPickerAPI(GooglePhotosAPI):
       album_id=album_id,
       title=title,
     )
-    pending_sessions = dict(GOOGLE_STORE.photos_picker_pending_sessions)
+    pending_sessions = GOOGLE_STORE.photos_picker_pending_sessions
     pending_sessions[session.id] = _pending_to_store(pending)
     GOOGLE_STORE.photos_picker_pending_sessions = pending_sessions
     LOOP.create_task(self._finish_selection(pending))
@@ -237,24 +237,24 @@ class GooglePhotosPickerAPI(GooglePhotosAPI):
     try:
       ready = await GOOGLE_PHOTOS_PICKER_SESSIONS.wait_until_ready(pending.session)
       if not ready:
-        await self._send_flow(
+        await FLOW_CLIENT.send_message(
           "google.photos.picker.cancelled", {"albumId": pending.album_id}
         )
         return
 
       items = await GOOGLE_PHOTOS_PICKER_SESSIONS.list_media_items(session_id)
-      album_id, imported_count = await self.import_picked_items(
+      album_id, imported_count = await GOOGLE_PHOTOS_API.import_picked_items(
         items, album_id=pending.album_id, album_title=pending.title
       )
       if album_id is None:
-        await self._send_flow(
+        await FLOW_CLIENT.send_message(
           "google.photos.picker.completed", {"albumId": None, "photoCount": 0}
         )
       else:
-        photos = await self.list_photos(album_id=album_id)
-        albums = await self.list_albums()
+        photos = await GOOGLE_PHOTOS_API.list_photos(album_id=album_id)
+        albums = await GOOGLE_PHOTOS_API.list_albums()
         album = next((item for item in albums if item.id == album_id), None)
-        await self._send_flow(
+        await FLOW_CLIENT.send_message(
           "google.photos.picker.completed",
           {
             "albumId": album_id,
@@ -267,7 +267,7 @@ class GooglePhotosPickerAPI(GooglePhotosAPI):
       raise
     except Exception as exc:
       logger.exception("Google Photos Picker session %s failed", session_id)
-      await self._send_flow(
+      await FLOW_CLIENT.send_message(
         "google.photos.picker.error",
         {"albumId": pending.album_id, "message": str(exc)},
       )
@@ -277,70 +277,26 @@ class GooglePhotosPickerAPI(GooglePhotosAPI):
       pending_sessions.pop(session_id, None)
       GOOGLE_STORE.photos_picker_pending_sessions = pending_sessions
 
-  async def _send_flow(self, message_type: str, fields: Mapping[str, Any]) -> None:
-    try:
-      await FLOW_CLIENT.send_json({"type": message_type, **fields})
-    except Exception:
-      logger.warning("Could not send Flow message %s", message_type, exc_info=True)
-
-  async def _on_select(self, message: dict) -> None:
-    album_id = message.get("albumId")
-    try:
-      pending = await self.create_selection(
-        album_id=str(album_id) if album_id else None,
-        title=str(message["title"]) if message.get("title") else None,
-        max_item_count=int(message.get("maxItemCount", DEFAULT_MAX_ITEM_COUNT)),
-      )
-      picker_uri = pending.session.picker_uri.rstrip("/") + "/autoclose"
-      await self._send_flow(
-        "google.photos.picker.session",
-        {
-          "albumId": pending.album_id,
-          "title": pending.title,
-          "sessionId": pending.session.id,
-          "url": picker_uri,
-          "pickerUri": picker_uri,
-        },
-      )
-    except Exception as exc:
-      logger.exception("Could not start Google Photos Picker session")
-      await self._send_flow(
-        "google.photos.picker.error",
-        {"albumId": str(album_id) if album_id else None, "message": str(exc)},
-      )
-
-  async def _on_list_albums(self, _: dict) -> None:
-    try:
-      albums = await self.list_albums()
-      await self._send_flow(
-        "google.photos.picker.albums",
-        {
-          "albums": [
-            {
-              "id": album.id,
-              "title": album.title,
-              "coverPhotoId": album.cover_photo_id,
-            }
-            for album in albums
-          ]
-        },
-      )
-    except Exception as exc:
-      logger.exception("Could not list Google Photos albums")
-      await self._send_flow("google.photos.picker.error", {"message": str(exc)})
-
 
 GOOGLE_PHOTOS_PICKER_API = GooglePhotosPickerAPI()
 
-FLOW_CLIENT.register(
-  "google.photos.picker.select[post]", GOOGLE_PHOTOS_PICKER_API._on_select
-)
-FLOW_CLIENT.register(
-  "google.photos.picker.amend[post]", GOOGLE_PHOTOS_PICKER_API._on_select
-)
-FLOW_CLIENT.register(
-  "google.photos.picker.albums[get]", GOOGLE_PHOTOS_PICKER_API._on_list_albums
-)
+
+async def _on_select(message: Mapping):
+  album_id = message.get("albumId")
+  pending = await GOOGLE_PHOTOS_PICKER_API.create_selection(
+    album_id=str(album_id) if album_id else None,
+    title=str(message["title"]) if message.get("title") else None,
+    max_item_count=int(message.get("maxItemCount", DEFAULT_MAX_ITEM_COUNT)),
+  )
+  return {
+    "albumId": pending.album_id,
+    "title": pending.title,
+    "sessionId": pending.session.id,
+    "pickerUri": pending.session.picker_uri,
+  }
+
+
+FLOW_CLIENT.register_request("google.picker.select", _on_select)
 
 
 def resume_pending_picker_sessions() -> None:
@@ -360,3 +316,6 @@ def resume_pending_picker_sessions() -> None:
       logger.exception("Discarding an invalid stored Google Photos Picker session")
   if len(valid_pending_sessions) != len(GOOGLE_STORE.photos_picker_pending_sessions):
     GOOGLE_STORE.photos_picker_pending_sessions = valid_pending_sessions
+
+
+resume_pending_picker_sessions()

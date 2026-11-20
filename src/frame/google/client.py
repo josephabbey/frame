@@ -4,13 +4,11 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from frame.web import AuthorizedClient, NotAuthenticated
-
-# Store is imported lazily to avoid circular imports during package initialization.
+from frame.web import AuthorizedWebClient, NotAuthenticated
 
 
 @dataclass(slots=True, kw_only=True)
-class GoogleClient(AuthorizedClient):
+class GoogleClient(AuthorizedWebClient):
   """Base client that adds an OAuth bearer token to Google requests."""
 
   def authorization_headers(self) -> dict[str, str]:

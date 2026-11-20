@@ -3,6 +3,7 @@
 import asyncio
 import dataclasses
 import logging
+from collections.abc import Mapping
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
@@ -48,16 +49,16 @@ class GoogleAccountAPI(AccountAPI):
     logger.info(f"Google authorization URL: {url}")
     return url
 
-  async def on_authorization_code(self, msg: dict):
+  async def on_authorization_code(self, msg: Mapping):
     await self.exchange_code(code=msg.get("code"))
 
   async def exchange_code(self, code: str):
     from .store import GOOGLE_STORE
 
     logger.info("Exchanging Google access token")
-    res = await FLOW_CLIENT.send_json_request(
+    res = await FLOW_CLIENT.send_message_request(
+      "web.request_json",
       {
-        "type": "web.request_json",
         "method": "POST",
         "url": TOKEN_URL,
         "data": {
@@ -67,7 +68,7 @@ class GoogleAccountAPI(AccountAPI):
           "redirect_uri": REDIRECT_URI,
           "grant_type": "authorization_code",
         },
-      }
+      },
     )
 
     GOOGLE_STORE.token = from_dict(
@@ -129,6 +130,8 @@ class GoogleAccountAPI(AccountAPI):
         token = await self.refresh_token()
         if token.expires_at:
           await asyncio.sleep((token.expires_at - datetime.now()).seconds - 300)
+    else:
+      logger.info("No Google token found, ending loop")
 
   async def get_account(self) -> Account:
     payload = await GOOGLE_CLIENT.request_json(
@@ -147,14 +150,11 @@ class GoogleAccountAPI(AccountAPI):
 GOOGLE_ACCOUNT_API = GoogleAccountAPI()
 
 
-FLOW_CLIENT.register(
-  "google.account.authorization_url[get]",
-  lambda _: FLOW_CLIENT.send_json(
-    {
-      "type": "google.account.authorization_url",
-      "url": GOOGLE_ACCOUNT_API.authorization_url(),
-    }
-  ),
+FLOW_CLIENT.register_request(
+  "google.account.authorization_url",
+  lambda _: {
+    "url": GOOGLE_ACCOUNT_API.authorization_url(),
+  },
 )
 
 FLOW_CLIENT.register(

@@ -38,3 +38,9 @@ class PhotosAPI(ABC):
     album_id: str | None = None,
     limit: int | None = None,
   ) -> Sequence[Photo]: ...
+
+  @abstractmethod
+  async def get_album(self, album_id: str) -> PhotoAlbum: ...
+
+  @abstractmethod
+  async def get_photo(self, photo_id: str) -> Photo: ...

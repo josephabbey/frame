@@ -5,6 +5,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from frame.data.photos import Photo, PhotoAlbum, PhotosAPI
+from frame.flow import FLOW_CLIENT
 from frame.utils import timestamp
 
 from .account import ALL_SCOPES
@@ -137,7 +138,7 @@ class GooglePhotosAPI(PhotosAPI):
       )
       page_token = payload.get("nextPageToken")
       if not page_token:
-        return tuple(albums)
+        return albums
 
   async def list_photos(
     self, *, album_id: str | None = None, limit: int | None = None
@@ -165,7 +166,21 @@ class GooglePhotosAPI(PhotosAPI):
         return tuple(photos[:limit])
       page_token = payload.get("nextPageToken")
       if not page_token:
-        return tuple(photos)
+        return photos
+
+  async def get_album(self, album_id: str) -> PhotoAlbum:
+    payload = await GOOGLE_CLIENT.request_json("GET", f"{BASE_URL}/albums/{album_id}")
+    return PhotoAlbum(
+      id=str(payload["id"]),
+      title=str(payload.get("title", "")),
+      cover_photo_id=payload.get("coverPhotoMediaItemId"),
+    )
+
+  async def get_photo(self, photo_id: str) -> Photo:
+    payload = await GOOGLE_CLIENT.request_json(
+      "GET", f"{BASE_URL}/mediaItems/{photo_id}"
+    )
+    return self._photo_from_payload(payload, None)
 
   @staticmethod
   def _photo_from_payload(payload: Mapping[str, Any], album_id: str | None) -> Photo:
@@ -184,3 +199,30 @@ class GooglePhotosAPI(PhotosAPI):
 
 
 GOOGLE_PHOTOS_API = GooglePhotosAPI()
+
+
+async def _albums_get(_):
+  return {
+    "albums": [
+      {
+        "id": album.id,
+        "title": album.title,
+        "cover_photo_id": album.cover_photo_id,
+        "cover_photo_url": None
+        if album.cover_photo_id is None
+        else (
+          (
+            cover_photo := await GOOGLE_PHOTOS_API.get_photo(album.cover_photo_id)
+          ).thumbnail_url
+          or cover_photo.source_url
+        ),
+      }
+      for album in await GOOGLE_PHOTOS_API.list_albums()
+    ]
+  }
+
+
+FLOW_CLIENT.register_request(
+  "data.photos.list_albums",
+  _albums_get,
+)

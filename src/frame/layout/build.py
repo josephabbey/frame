@@ -5,17 +5,17 @@ from random import choice, choices
 from material_color_utilities import DynamicScheme, theme_from_color
 
 from frame.data import Photo
-from frame.google import GOOGLE_PHOTOS_API, GOOGLE_PHOTOS_PICKER_API
-from frame.layout.photos import full_bleed, gallery_triptych
-from frame.layout.settings import LAYOUT_SETTINGS
+from frame.google import GOOGLE_PHOTOS_API
 from frame.local import LOCAL_PHOTOS_API
 from frame.ui import Element, PaddingSides
+
+from .photos import full_bleed, gallery_triptych
+from .settings import LAYOUT_SETTINGS
 
 default_scheme = theme_from_color(source="#FFC0CB").schemes.light
 
 # TODO_PHOTOS_API = LOCAL_PHOTOS_API
-# TODO_PHOTOS_API = GOOGLE_PHOTOS_API
-TODO_PHOTOS_API = GOOGLE_PHOTOS_PICKER_API
+TODO_PHOTOS_API = GOOGLE_PHOTOS_API
 
 
 async def get_random_photos_from_random_album(n: int):

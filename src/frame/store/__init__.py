@@ -1,17 +1,25 @@
 import logging
+import os
 import re
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from typing import Any
+from pathlib import Path
+from typing import Any, cast
 
 from dacite import from_dict
 
-from frame.settings import SETTINGS_PATH
 from frame.utils import pickle
 
 logger = logging.getLogger(__name__)
 
-registry = []
+
+SETTINGS_PATH = (
+  (Path(cast(str, os.environ.get("FRAME_SETTINGS_PATH"))))
+  if ("FRAME_SETTINGS_PATH" in os.environ)
+  else Path.home() / ".config/frame"
+)
+
+registry: list[Store] = []
 
 
 def to_snake_case(text: str) -> str:
@@ -32,7 +40,6 @@ class Store:
 
   def __post_init__(self):
     registry.append(self)
-    self.store()
 
   @classmethod
   def name(cls):
@@ -43,7 +50,9 @@ class Store:
     return SETTINGS_PATH / f"{to_snake_case(cls.__name__)}.store"
 
   def to_dict(self):
-    return asdict(self)
+    ret = asdict(self)
+    ret.pop("_listeners")
+    return ret
 
   @classmethod
   def from_dict(cls, data: dict[str, Any]):
@@ -58,8 +67,9 @@ class Store:
     try:
       with cls.path().open("rb") as f:
         loaded = pickle.load_with_defaults(f)
-        logger.info(f"Loaded store: {cls.name()}")
         if isinstance(loaded, cls):
+          logger.info(f"Loaded store: {cls.name()}")
+          loaded.__post_init__()
           return loaded
         else:
           raise TypeError(f"Invalid Store for {cls.name()}")

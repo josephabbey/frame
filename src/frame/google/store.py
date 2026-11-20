@@ -12,21 +12,5 @@ class GoogleStore(Store):
   token: OAuthToken | None = None
   photos_picker_pending_sessions: dict[str, Any] = field(default_factory=dict)
 
-  def __setstate__(self, state: Any) -> None:
-    """Load older Google stores while dropping their cached album fields."""
-    if isinstance(state, tuple) and len(state) == 2:
-      values = {**(state[0] or {}), **(state[1] or {})}
-    elif isinstance(state, dict):
-      values = state
-    else:
-      values = {}
-    object.__setattr__(self, "_listeners", values.get("_listeners", []))
-    object.__setattr__(self, "token", values.get("token"))
-    object.__setattr__(
-      self,
-      "photos_picker_pending_sessions",
-      values.get("photos_picker_pending_sessions", {}),
-    )
-
 
 GOOGLE_STORE = GoogleStore.load()
